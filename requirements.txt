@@ -1,1 +1,7 @@
-fastapi uvicorn pydantic python-dotenv starlette pandas numpy 
+fastapi
+uvicorn
+pydantic
+python-dotenv
+starlette
+pandas
+numpy
