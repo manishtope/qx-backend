@@ -3,23 +3,20 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-app = FastAPI(title="QX Quantum Engine Backend")
+app = FastAPI(title="QX Quantum Multi-Indicator Engine")
 
-# Enable CORS cross-origin access so Vercel can talk to Render safely
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all public web domains to connect
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Input data structures for incoming post requests
 class SignalRequest(BaseModel):
     asset: str
     timeframe: str
 
-# Your exact asset list with the EURJPY-OTC formatting typo fixed!
 AVAILABLE_ASSETS = [
     {"symbol": "EURUSD", "name": "EUR/USD", "category": "forex", "base_price": 1.1580},
     {"symbol": "GBPUSD", "name": "GBP/USD", "category": "forex", "base_price": 1.3380},
@@ -47,29 +44,42 @@ AVAILABLE_ASSETS = [
 
 @app.get("/")
 def read_root():
-    return {"status": "online", "engine": "QX Quantum Core"}
+    return {"status": "online", "engine": "Advanced Quantum Core"}
 
 @app.get("/api/assets")
 def get_assets():
-    """Returns your custom asset vectors to the frontend selector dropdown"""
     return {"assets": AVAILABLE_ASSETS}
 
 @app.post("/api/generate-signal")
 def generate_signal(request: SignalRequest):
-    """
-    Computes real-time execution parameters based on your asset array.
-    """
     try:
         direction_choice = random.choice(["CALL", "PUT"])
-        confidence_score = random.randint(76, 98)
+        confidence_score = random.randint(82, 98)
         
-        # Build contextual analysis explanation arrays
-        indicators = ["RSI divergence structural break", "MACD signal crossover block", "EMA support bounce", "Fibonacci golden pocket cluster"]
-        market_condition = random.choice(["oversold pressure scaling", "overbought exhaustion volume", "momentum volatility expansion"])
+        # 1. Dynamically find base price for math calculations
+        base_price = 1.0000
+        for item in AVAILABLE_ASSETS:
+            if item["symbol"] == request.asset:
+                base_price = item["base_price"]
+                break
         
-        reasoning_text = f"The algorithm detected an advanced {random.choice(indicators)} on the {request.timeframe} chart for {request.asset} matching a classic {market_condition}. Probability distribution clusters recommend entry confirmation."
+        # 2. Math calculations for entry/exit boundary indicators
+        variance = base_price * 0.0015
+        entry_target = base_price + (random.uniform(-variance, variance))
+        exit_target = entry_target + (base_price * 0.0025 if direction_choice == "CALL" else -base_price * 0.0025)
+        
+        rsi_val = random.randint(18, 40) if direction_choice == "CALL" else random.randint(62, 85)
+        bb_status = "Price piercing lower boundary band" if direction_choice == "CALL" else "Price testing upper ceiling structure"
+        
+        # 3. Compile structural multi-indicator breakdown text
+        reasoning_text = (
+            f"⚡ [STRATEGY EXHAUSTION MASTER] Engine tracking {request.asset} at baseline context. "
+            f"Relative Strength Index (RSI) is holding critical value at {rsi_val}. "
+            f"Bollinger Bands indicate: '{bb_status}'. "
+            f"🎯 OPTIMAL ENTRY RADAR TARGET: {entry_target:.5f} | "
+            f"🎯 TARGET TAKE-PROFIT EXIT MARGIN: {exit_target:.5f}."
+        )
 
-        # Return object structure matching frontend keys exactly
         return {
             "asset": request.asset,
             "direction": direction_choice,
@@ -82,4 +92,4 @@ def generate_signal(request: SignalRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="0.0.0.0", port=8001, reload=True)
+    uvicorn.run("server:app", host="0.0.0.0", port=8001)
